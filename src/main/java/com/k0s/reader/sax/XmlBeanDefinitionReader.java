@@ -32,7 +32,7 @@ public class XmlBeanDefinitionReader implements BeanDefinitionReader {
     }
     @Override
     @SneakyThrows
-    public Map<String, BeanDefinition> getBeanDefinition() {
+    public Map<String, BeanDefinition> getBeanDefinitionMap() {
         return getBeanDefinitionMap(getClass().getClassLoader().getResourceAsStream(this.path));
     }
 }

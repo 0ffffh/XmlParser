@@ -5,5 +5,5 @@ import com.k0s.entity.BeanDefinition;
 import java.util.Map;
 
 public interface BeanDefinitionReader {
-    Map<String, BeanDefinition> getBeanDefinition();
+    Map<String, BeanDefinition> getBeanDefinitionMap();
 }

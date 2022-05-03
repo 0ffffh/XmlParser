@@ -1,6 +1,7 @@
 package com.k0s.reader.sax;
 
 import com.k0s.entity.BeanDefinition;
+import com.k0s.exception.ParseContextException;
 import lombok.Getter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -33,40 +34,40 @@ public class XMLHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        if(qName.equalsIgnoreCase(BEAN)){
+        if (BEAN.equalsIgnoreCase(qName)) {
             isBean = true;
 
             String id = attributes.getValue(ID);
-            if (id == null){
-                throw new RuntimeException("No id");
+            if (id == null) {
+                throw new ParseContextException("No specified id for bean");
             }
 
             String clazzName = attributes.getValue(CLASS);
-            if(clazzName == null){
-                throw new RuntimeException("No Class name");
+            if (clazzName == null) {
+                throw new ParseContextException("No specified class for bean");
             }
 
             beanDefinition = new BeanDefinition(id, clazzName);
-            valueDependencies = new HashMap<>();
-            refDependencies = new HashMap<>();
+            valueDependencies = new HashMap<>(1);
+            refDependencies = new HashMap<>(1);
         }
-        if(qName.equalsIgnoreCase(PROPERTY)){
-            if(!isBean){
-                throw new RuntimeException("No specified bean for property");
+        if (PROPERTY.equalsIgnoreCase(qName)) {
+            if (!isBean) {
+                throw new ParseContextException("No specified bean for property");
             }
 
             String name = attributes.getValue(NAME);
-            if(name == null){
-                throw new RuntimeException("No property name");
+            if (name == null) {
+                throw new ParseContextException("No specified name for property");
             }
 
             String value = attributes.getValue(VALUE);
-            if (value != null){
-                valueDependencies.put(name,value);
+            if (value != null) {
+                valueDependencies.put(name, value);
             }
 
             String ref = attributes.getValue(REF);
-            if(ref != null){
+            if (ref != null) {
                 refDependencies.put(name, ref);
             }
         }
@@ -74,10 +75,11 @@ public class XMLHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) {
-        if(qName.equalsIgnoreCase(BEAN)){
+        if (qName.equalsIgnoreCase(BEAN)) {
             isBean = false;
             beanDefinition.setValueDependencies(valueDependencies);
             beanDefinition.setRefDependencies(refDependencies);
+
             beanDefinitionMap.put(beanDefinition.getId(), beanDefinition);
         }
     }
